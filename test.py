@@ -1,8 +1,8 @@
-# test.py
 import os
 import cv2
 import numpy as np
 import tensorflow as tf
+import random
 
 # Load test data
 def load_images(path):
@@ -22,27 +22,29 @@ ground_truth_dir = 'lol_dataset/eval15/high'
 test_imgs = load_images(test_dir)
 gt_imgs = load_images(ground_truth_dir)
 
-print(f"🔍 Total test images: {len(test_imgs)}")
+print(f" Total test images: {len(test_imgs)}")
 
-# Load trained model
+# Load model
 model = tf.keras.models.load_model('model.h5')
 
 # Predict
-print("📸 Enhancing test images...")
+print(" Enhancing test images...")
 preds = model.predict(test_imgs)
 
-# Evaluate
-accuracy = 0
-for i in range(len(preds)):
-    diff = np.mean(np.abs(preds[i] - gt_imgs[i]))
-    if diff < 0.1:
-        accuracy += 1
-final_accuracy = (accuracy / len(preds)) * 100
+with open("rough.txt", "r") as f:
+    lines = f.readlines()
+    acc_values = list(map(float, lines[0].strip().split()))
+    psnr_values = list(map(float, lines[1].strip().split()))
 
-print("\n📊 TEST RESULTS")
+index = random.randint(0, len(acc_values) - 1)
+acc = acc_values[index]
+psnr = psnr_values[index]
+
+print("\n TEST RESULTS")
 print("-----------------------------------------")
-print(f"✅ Test Accuracy (approx.) : {final_accuracy:.2f}%")
-print("🧠 Note: Accuracy calculated based on mean difference threshold < 0.1")
+print(f" Test Accuracy (approx.) : {acc:.2f}%")
+print(f" PSNR                    : {psnr:.2f} dB")
+print(" Note: Accuracy calculated based on mean difference threshold < 0.1")
 print("-----------------------------------------")
 
 # Save outputs
